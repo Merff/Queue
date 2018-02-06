@@ -6,6 +6,10 @@ defmodule Queue do
     {:error, "provide text message!"}
   end
 
+  def add(text) when not is_binary(text) do
+    {:error, "invalid format, must be a string!"}
+  end
+
   def add(text)  do
     case create_message(text) do
       {:ok, _} ->

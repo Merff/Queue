@@ -10,6 +10,6 @@ defmodule Queue.Message do
   def changeset(message, params \\ %{}) do
     message
     |> Ecto.Changeset.cast(params, [:text, :status, :priority])
-    |> Ecto.Changeset.validate_required([:text, :priority])
+    |> Ecto.Changeset.validate_required([:text, :status, :priority])
   end
 end
