@@ -25,7 +25,7 @@ defmodule Queue do
   def get() do
     case get_next_message() do
       nil ->
-        {:ok, "there is no available message"}
+        {:ok, "there is no available message!"}
       {:ok, %Message{} = message} ->
         {:ok, message.text, message.id}
     end
