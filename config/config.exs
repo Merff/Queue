@@ -2,6 +2,14 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :queue, Queue.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "queue_repo",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost"
+
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,
@@ -28,3 +36,5 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+
+config :queue, ecto_repos: [Queue.Repo]

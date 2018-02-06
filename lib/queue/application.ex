@@ -6,8 +6,10 @@ defmodule Queue.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
     # List all child processes to be supervised
     children = [
+      Queue.Repo,
       # Starts a worker by calling: Queue.Worker.start_link(arg)
       # {Queue.Worker, arg},
     ]
