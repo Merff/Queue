@@ -3,7 +3,7 @@ defmodule Queue.Message do
 
   schema "messages" do
     field :text, :string
-    field :status, :integer
-    field :priority, :integer
+    field :status, :integer, default: 0
+    field :priority, :utc_datetime
   end
 end
