@@ -1,2 +1,2 @@
 import EctoEnum
-defenum StatusEnum, new: 0, ack: 1, reject: 2
+defenum StatusEnum, new: 0, processing: 1, ack: 2, reject: 3
