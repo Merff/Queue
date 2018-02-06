@@ -2,7 +2,7 @@ defmodule QueueTest do
   use ExUnit.Case
   doctest Queue
 
-  alias Queue.Repo
+  alias Queue.{Repo, Message}
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -30,15 +30,37 @@ defmodule QueueTest do
     end
   end
 
+
   describe "get/0" do
-    setup [:create_message]
-    test "get next message" do
-      assert {:ok, message_text, _} = Queue.get()
-      assert message_text == "my message"
+
+    test "get next message and set status to :processing" do
+      create_message(%{text: "my message", priority: NaiveDateTime.utc_now()})
+      {:ok, message} = Queue.get()
+      assert message.text == "my message"
+      assert message.status == :processing
+    end
+
+    test "when no one exist" do
+      assert Queue.get() == {:ok, "there is no available message!"}
+    end
+
+    test "when no one avalable" do
+      create_message(%{text: "my message", status: :processing, priority: NaiveDateTime.utc_now()})
+      assert Queue.get() == {:ok, "there is no available message!"}
+    end
+
+    test "sort by priority" do
+      create_message(%{text: "my message_1", priority: ~N[2018-02-06 20:02:47]})
+      create_message(%{text: "my message_2", priority: ~N[2018-01-06 20:02:47]})
+      {:ok, message} = Queue.get()
+      assert message.text == "my message_2"
     end
   end
 
-  defp create_message(_) do
-    Queue.add(@valid_attrs)
+  defp create_message(attrs) do
+    %Message{}
+    |> Message.changeset(attrs)
+    |> Repo.insert()
   end
+
 end

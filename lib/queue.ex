@@ -27,7 +27,7 @@ defmodule Queue do
       nil ->
         {:ok, "there is no available message!"}
       {:ok, %Message{} = message} ->
-        {:ok, message.text, message.id}
+        {:ok, message}
     end
   end
 
