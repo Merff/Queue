@@ -13,6 +13,7 @@ defmodule QueueTest do
   @invalid_format_attrs 07
 
   describe "add/1" do
+
     test "add message with valid attrs" do
       assert Queue.add(@valid_attrs) == {:ok, "new message added!"}
     end
@@ -28,6 +29,7 @@ defmodule QueueTest do
     test "add message with invalid format attrs" do
       assert Queue.add(@invalid_format_attrs) == {:error, "invalid format, must be a string!"}
     end
+
   end
 
 
@@ -40,21 +42,36 @@ defmodule QueueTest do
       assert message.status == :processing
     end
 
-    test "when no one exist" do
+    test "when no one message exist" do
       assert Queue.get() == {:ok, "there is no available message!"}
     end
 
-    test "when no one avalable" do
+    test "when no one message avalable" do
       create_message(%{text: "my message", status: :processing, priority: NaiveDateTime.utc_now()})
       assert Queue.get() == {:ok, "there is no available message!"}
     end
 
-    test "sort by priority" do
+    test "messages sort by priority" do
       create_message(%{text: "my message_1", priority: ~N[2018-02-06 20:02:47]})
       create_message(%{text: "my message_2", priority: ~N[2018-01-06 20:02:47]})
       {:ok, message} = Queue.get()
       assert message.text == "my message_2"
     end
+
+  end
+
+  describe "ack/1" do
+
+    test "set message status to :ack" do
+      {:ok, message} = create_message(%{text: "my message", priority: NaiveDateTime.utc_now()})
+      {:ok, message} = Queue.ack(message.id)
+      assert message.status == :ack
+    end
+
+    test "when invalid message_id" do
+      assert Queue.ack(07) == {:error, "message not found!"}
+    end
+
   end
 
   defp create_message(attrs) do

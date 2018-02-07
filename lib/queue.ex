@@ -26,8 +26,15 @@ defmodule Queue do
     case get_next_message() do
       nil ->
         {:ok, "there is no available message!"}
-      {:ok, %Message{} = message} ->
-        {:ok, message}
+      %Message{} = message ->
+        set_status_as_processing(message)
+    end
+  end
+
+  def ack(message_id) do
+    case get_message(message_id) do
+      nil -> {:error, "message not found!"}
+      message -> update_message(message, %{status: :ack})
     end
   end
 
@@ -44,13 +51,19 @@ defmodule Queue do
       order_by: [asc: m.priority],
       limit: 1
     Repo.one(query)
-    |> update_message(%{status: :processing}) # set status to :processing
+  end
+
+  defp get_message(id) do
+    Repo.get(Message, id)
+  end
+
+  defp set_status_as_processing(message) do
+    update_message(message, %{status: :processing})
   end
 
   defp update_message(nil, _) do
     nil
   end
-
   defp update_message(%Message{} = message, attrs) do
     Message.changeset(message, attrs)
     |> Repo.update()
