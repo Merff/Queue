@@ -1,6 +1,5 @@
 defmodule QueueTest do
   use ExUnit.Case
-  doctest Queue
 
   alias Queue.{Repo, Message}
 
@@ -64,12 +63,27 @@ defmodule QueueTest do
 
     test "set message status to :ack" do
       {:ok, message} = create_message(%{text: "my message", priority: NaiveDateTime.utc_now()})
-      {:ok, message} = Queue.ack(message.id)
-      assert message.status == :ack
+      {:ok, updated_message} = Queue.ack(message.id)
+      assert updated_message.status == :ack
     end
 
     test "when invalid message_id" do
-      assert Queue.ack(07) == {:error, "message not found!"}
+      assert Queue.ack(@invalid_format_attrs) == {:error, "message not found!"}
+    end
+
+  end
+
+  describe "reject/1" do
+
+    test "set message status to :reject and update priority" do
+      {:ok, message} = create_message(%{text: "my message", priority: NaiveDateTime.utc_now()})
+      {:ok, updated_message} = Queue.reject(message.id)
+      assert updated_message.status == :reject
+      assert updated_message.priority > message.priority
+    end
+
+    test "when invalid message_id" do
+      assert Queue.reject(@invalid_format_attrs) == {:error, "message not found!"}
     end
 
   end

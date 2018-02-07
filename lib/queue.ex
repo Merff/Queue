@@ -27,7 +27,7 @@ defmodule Queue do
       nil ->
         {:ok, "there is no available message!"}
       %Message{} = message ->
-        set_status_as_processing(message)
+        update_message(message, %{status: :processing})
     end
   end
 
@@ -35,6 +35,13 @@ defmodule Queue do
     case get_message(message_id) do
       nil -> {:error, "message not found!"}
       message -> update_message(message, %{status: :ack})
+    end
+  end
+
+  def reject(message_id) do
+    case get_message(message_id) do
+      nil -> {:error, "message not found!"}
+      message -> update_message(message, %{status: :reject, priority: NaiveDateTime.utc_now()})
     end
   end
 
@@ -55,10 +62,6 @@ defmodule Queue do
 
   defp get_message(id) do
     Repo.get(Message, id)
-  end
-
-  defp set_status_as_processing(message) do
-    update_message(message, %{status: :processing})
   end
 
   defp update_message(nil, _) do
